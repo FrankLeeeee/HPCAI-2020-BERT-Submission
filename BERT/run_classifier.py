@@ -29,7 +29,7 @@ from __future__ import print_function
 import collections
 import csv
 import os
-import modeling_v2 as modeling
+import modeling_v0 as modeling
 # import optimization_v1 as optimization
 import optimization
 import tokenization
@@ -47,7 +47,7 @@ flags = tf.flags
 
 FLAGS = flags.FLAGS
 
-## Required parameters
+# Required parameters
 flags.DEFINE_string(
     "data_dir", None,
     "The input data dir. Should contain the .tsv files (or other data files) "
@@ -67,7 +67,7 @@ flags.DEFINE_string(
     "output_dir", None,
     "The output directory where the model checkpoints will be written.")
 
-## Other parameters
+# Other parameters
 flags.DEFINE_string("dllog_path", "/results/bert_dllog.json",
                     "filename where dllogger writes to")
 
@@ -180,9 +180,11 @@ def file_based_input_fn_builder(input_file,
 
         # For training, we want a lot of parallel reading and shuffling.
         # For eval, we want no shuffling and parallel reading doesn't matter.
-        d = tf.data.TFRecordDataset(input_file, buffer_size=100, num_parallel_reads=5)
+        d = tf.data.TFRecordDataset(
+            input_file, buffer_size=100, num_parallel_reads=5)
         if is_training:
-            if hvd is not None: d = d.shard(hvd.size(), hvd.rank())
+            if hvd is not None:
+                d = d.shard(hvd.size(), hvd.rank())
             d = d.repeat()
             d = d.shuffle(buffer_size=100)
 
@@ -232,10 +234,9 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
         # def calc_logits(x, w):
         #     logits = tf.matmul(x, w, transpose_b=True)
         #     return logits
-        
+
         # calc_logits = tf.contrib.layers.recompute_grad(calc_logits)
         # logits = calc_logits(output_layer, output_weights)
-
 
         logits = tf.matmul(output_layer, output_weights, transpose_b=True)
         logits = tf.nn.bias_add(logits, output_bias, name='cls_logits')
@@ -515,7 +516,8 @@ def input_fn_builder(features,
         })
 
         if is_training:
-            if hvd is not None: d = d.shard(hvd.size(), hvd.rank())
+            if hvd is not None:
+                d = d.shard(hvd.size(), hvd.rank())
             d = d.repeat()
             d = d.shuffle(buffer_size=100)
 
@@ -607,11 +609,11 @@ def main(_):
     run_config = tf.estimator.RunConfig(
         model_dir=FLAGS.output_dir if master_process else None,
         session_config=config,
-        #save_checkpoints_steps=FLAGS.save_checkpoints_steps
+        # save_checkpoints_steps=FLAGS.save_checkpoints_steps
         save_checkpoints_secs=60*20
         if master_process else None,
-        #save_summary_steps=FLAGS.save_checkpoints_steps
-        #if master_process else None,
+        # save_summary_steps=FLAGS.save_checkpoints_steps
+        # if master_process else None,
         log_step_count_steps=FLAGS.display_loss_steps,
         keep_checkpoint_max=1)
 
@@ -693,7 +695,8 @@ def main(_):
                         hooks=training_hooks)
         train_time_elapsed = time.time() - train_start_time
         train_time_wo_overhead = training_hooks[-1].total_time
-        avg_sentences_per_second = num_train_steps * global_batch_size * 1.0 / train_time_elapsed
+        avg_sentences_per_second = num_train_steps * \
+            global_batch_size * 1.0 / train_time_elapsed
         ss_sentences_per_second = (
             num_train_steps - training_hooks[-1].skipped
         ) * global_batch_size * 1.0 / train_time_wo_overhead
