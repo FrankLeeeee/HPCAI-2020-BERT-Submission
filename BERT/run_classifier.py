@@ -29,7 +29,7 @@ from __future__ import print_function
 import collections
 import csv
 import os
-import modeling_v0 as modeling
+import modeling_v2 as modeling
 # import optimization_v1 as optimization
 import optimization
 import tokenization

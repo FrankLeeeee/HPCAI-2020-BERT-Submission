@@ -115,7 +115,25 @@ ws=${10:-"0.1"}
 qsub -I -q dgx -l walltime=1:00:00,select=2:ngpus=4:ncpus=20:mpiprocs=4,place=scatter -P $ProjectID 
 ```
 
-7. 
+7. run experiment 
 ```shell
 bash $PATH_TO_SSHCONT/sshcont/invocation
+```
+
+8. run evaluation. As gradient checkpointing is not needed in evaluation, thus, you need to comment out the lines 259, 1041, 1042, 1067, 1068, 1088, 1089 and change `ckpt` to be `False` in line 1018.
+```shell
+# comment out the following lines
+# 259: pool_output = tf.contrib.layers.recompute_grad(pool_output)
+# 1041: dense_output = tf.contrib.layers.recompute_grad(
+# 1042:                           dense_output)
+# 1067: dense_intermediate = tf.contrib.layers.recompute_grad(
+# 1068:                         dense_intermediate)
+# 1088: dense_output_2 = tf.contrib.layers.recompute_grad(
+# 1089:                         dense_output_2)
+
+# change line 1018
+# ckpt=layer_idx%2==0) -> ckpt=False)
+
+# run evaluation
+bash $PATH_TO_SUBMISSION/BERT/hpcai_scripts/eval.sh
 ```
