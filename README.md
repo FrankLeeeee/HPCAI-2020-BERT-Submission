@@ -73,17 +73,26 @@ bash ./hpcai_scripts/eval.sh
 ## Run Optimized Code
 
 To run the optimized code on 2 nodes with 4 GPUs on each node, you need to follow the following steps:
-1. setup multinode communcation ssh 
-```shell
-to be completed by yuhao 
+1. Copy folders `apps` and `scripts` under the $PATH_TO_SUBMISSION/multinode_communication to $HOME directory
+```shell 
+cp -r $PATH_TO_SUBMISSION/multinode_communication/* $HOME
 ```
 
-2. Make sure the `GLUE_SCRIPT` points to the `BERT/hpcai_scripts/run_glue_nscc.sh` in the `job_tensorflow_gloo.sh`
+2. Edit file $HOME/scripts/sshcont/`job_tensorflow_gloo.sh`
 ```
-GLUE_SCRIPT=$PATH_TO_SUBMISSION/BERT/hpcai_scripts/run_glue_nscc.sh
+# edit line 6: RESULTS_DIR pointing to the directory where experiment results are saved 
+# RESULTS_DIR=...
+# edit line 13: GLUE_SCRIPT pointing to `BERT/hpcai_scripts/run_glue_nscc.sh`
+# GLUE_SCRIPT=$PATH_TO_SUBMISSION/BERT/hpcai_scripts/run_glue_nscc.sh
+```
+3. Edit file $HOME/scripts/sshcont/`tensorflow.sh` (this is the time for establishing connections among all nodes, and usually 180s is enough. you may increase it as you scale to more nodes or the network is slower) 
+```
+# edit line 13 and 14: xxxs (e.g. 180s) 
+# echo "Waiting xxxs for SSH servers to be up"
+# sleep xxxs
 ```
 
-3. The optimized code is using the model with gradient checkpointing. Thus, you need to edit the `run_classifier.py` like below:
+4. The optimized code is using the model with gradient checkpointing. Thus, you need to edit the `run_classifier.py` like below:
 ```
 # change line 32
 # import modeling_v0 as modeling 
@@ -91,7 +100,7 @@ GLUE_SCRIPT=$PATH_TO_SUBMISSION/BERT/hpcai_scripts/run_glue_nscc.sh
 import modeling_v2 as modeling
 ``` 
 
-4. Also, make sure the config is consistent with the optimized config in the `run_glue_nscc.sh`
+5. Also, make sure the config is consistent with the optimized config in the `run_glue_nscc.sh`
 ```shell
 task_name=${1:-"MNLI"}
 batch_size=${2:-"48"}
@@ -108,19 +117,19 @@ ws=${10:-"0.1"}
 # variable num_gpu is not in effect in the optimized code
 ```
 
-5. Set the correct `BERT_DIR`, `GLUE_DIR` and `run_classifier.py` path in `run_glue_nscc.sh`. Set the correct `RESULTS_DIR` in `job_tensorflow_gloo.sh` 
+6. Set the correct `BERT_DIR`, `GLUE_DIR` and `run_classifier.py` path in `run_glue_nscc.sh`. Set the correct `RESULTS_DIR` in `job_tensorflow_gloo.sh` 
 
-6. get interactive job
+7. get interactive job
 ```shell
 qsub -I -q dgx -l walltime=1:00:00,select=2:ngpus=4:ncpus=20:mpiprocs=4,place=scatter -P $ProjectID 
 ```
 
-7. run experiment 
+8. run experiment 
 ```shell
-bash $PATH_TO_SSHCONT/sshcont/invocation
+bash $HOME/sshcont/invocation
 ```
 
-8. run evaluation. As gradient checkpointing is not needed in evaluation, thus, you need to comment out the lines 259, 1041, 1042, 1067, 1068, 1088, 1089 and change `ckpt` to be `False` in line 1018.
+9. run evaluation. As gradient checkpointing is not needed in evaluation, thus, you need to comment out the lines 259, 1041, 1042, 1067, 1068, 1088, 1089 and change `ckpt` to be `False` in line 1018.
 ```shell
 # comment out the following lines
 # 259: pool_output = tf.contrib.layers.recompute_grad(pool_output)
