@@ -1,0 +1,7 @@
+
+# load dropbear: add dropbear bin and sbin to system path
+export PATH=/home/users/ntu/c170166/apps/software/dropbear/2020.80/bin:/home/users/ntu/c170166/apps/software/dropbear/2020.80/sbin:$PATH
+
+echo $PATH
+
+~/scripts/sshcont/ssh_and_run.py ~/scripts/sshcont/tensorflow.sh ~/scripts/sshcont/job_tensorflow_gloo.sh
