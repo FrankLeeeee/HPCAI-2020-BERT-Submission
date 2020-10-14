@@ -1,6 +1,6 @@
 
 # load dropbear: add dropbear bin and sbin to system path
-export PATH=/home/users/ntu/c170166/apps/software/dropbear/2020.80/bin:/home/users/ntu/c170166/apps/software/dropbear/2020.80/sbin:$PATH
+export PATH=$HOME/apps/software/dropbear/2020.80/bin:$HOME/apps/software/dropbear/2020.80/sbin:$PATH
 
 echo $PATH
 
