@@ -30,7 +30,7 @@ CUDA | cuDNN | NCCL | Tensorflow | Horovod | Python
 --- | - | - | - | - | - 
 10.2 | 7.6.5 | 2.5.6 | 1.15 | 0.19 | 3.6.9
 
-## Results
+## Results in 20mins
 model | bs | xla | #gpus | grad ckpt | optim | #steps/sec | #sentences/sec | #steps at 20mis | throughput at 20mins | acc | loss
 --- | - | - | - | - | - | - | - | - | - | - | -
 Baseline | 24 | True | 1 | False | LAMB | 4.8 | 115.2 | 2938 | 70512 | 0.804 | 0.504
