@@ -35,7 +35,6 @@ model | bs | xla | #gpus | grad ckpt | optim | #steps/sec | #sentences/sec | #st
 --- | - | - | - | - | - | - | - | - | - | - | -
 Baseline | 24 | True | 1 | False | LAMB | 4.8 | 115.2 | 2938 | 70512 | 0.804 | 0.504
 Optimized | 48 | True | 8 | True | LAMB | 2.53 | 971.52 | 1225 | 470400 | 0.8641 | 0.3703
-**Formula**
 * #sentences/sec = bs * #steps/sec * #gpus
 * throughput at 20mins = bs * #steps at 20mis * #gpus
 
