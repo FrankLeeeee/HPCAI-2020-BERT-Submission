@@ -38,6 +38,7 @@ Optimized | 48 | True | 8 | True | LAMB | 2.53 | 971.52 | 1225 | 470400 | 0.8641
 * #sentences/sec = bs * #steps/sec * #gpus
 * throughput at 20mins = bs * #steps at 20mis * #gpus
 
+**The optimized code is running on 2 nodes with each node having 4 GPUs, making it 8 GPUs. This is the max resources we successfully queued for**
 
 ## Run Baseline
 
