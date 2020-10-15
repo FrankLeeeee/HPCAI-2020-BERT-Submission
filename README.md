@@ -26,6 +26,8 @@ git clone https://github.com/FrankLeeeee/HPCAI-2020-BERT-Submission.git
 ```
 
 ## Dependency
+Singularity image: nvcr.io/nvidia/tensorflow:20.02-tf1-py3.sif
+
 CUDA | cuDNN | NCCL | Tensorflow | Horovod | Python
 --- | - | - | - | - | - 
 10.2 | 7.6.5 | 2.5.6 | 1.15 | 0.19 | 3.6.9
@@ -47,7 +49,7 @@ To run the baseline experiment, you need to follow the following steps:
 1. change the variables `BERT_DIR`, `GLUE_DIR` and `RESULTS_DIR` in `hpcai_scripts/run_glue.sh`
 
 2. The baseline is using the original model implementation provided by Nvidia. Thus, you need to edit the `run_classifier.py` like below:
-```
+```shell
 # change line 32
 # import modeling_v2 as modeling 
 # to the line below 
@@ -94,21 +96,21 @@ mkdir $HOME/sshcont
 ```
 
 2. Edit file $HOME/scripts/sshcont/`job_tensorflow_gloo.sh`
-```
+```shell
 # edit line 6: RESULTS_DIR pointing to the directory where experiment results are saved 
 RESULTS_DIR=...
 # edit line 13: GLUE_SCRIPT pointing to `BERT/hpcai_scripts/run_glue_nscc.sh`
 GLUE_SCRIPT=$PATH_TO_SUBMISSION/BERT/hpcai_scripts/run_glue_nscc.sh
 ```
 3. Edit file $HOME/scripts/sshcont/`tensorflow.sh` (this is the time for establishing connections among all nodes, and usually 180s is enough. you may increase it as you scale to more nodes or the network is slower) 
-```
+```shell
 # edit line 13 and 14: xxxs (e.g. 180s) 
 echo "Waiting xxxs for SSH servers to be up"
 sleep xxxs
 ```
 
 4. The optimized code is using the model with gradient checkpointing. Thus, you need to edit the `run_classifier.py` like below:
-```
+```shell
 # change line 32
 # import modeling_v0 as modeling 
 # to the line below
@@ -141,7 +143,7 @@ qsub -I -q dgx -l walltime=1:00:00,select=2:ngpus=4:ncpus=20:mpiprocs=4,place=sc
 
 8. run experiment 
 ```shell
-bash $HOME/sshcont/invocation
+bash $HOME/scripts/sshcont/invocation
 ```
 
 9. run evaluation. As gradient checkpointing is not needed in evaluation, thus, you need to comment out the lines 259, 1041, 1042, 1067, 1068, 1088, 1089 and change `ckpt` to be `False` in line 1018.
