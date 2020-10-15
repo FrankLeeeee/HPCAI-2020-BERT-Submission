@@ -34,7 +34,7 @@ CUDA | cuDNN | NCCL | Tensorflow | Horovod | Python
 model | bs | xla | #gpus | grad ckpt | optim | #steps/sec | #sentences/sec | #steps at 20mis | throughput at 20mins | acc | loss
 --- | - | - | - | - | - | - | - | - | - | - | -
 Baseline | 24 | True | 1 | False | LAMB | 4.8 | 115.2 | 2938 | 70512 | 0.804 | 0.504
-Optimized | 48 | True | 8 | True | LAMB | 2.53 | 971.52 | 1225 | 470400 | 0.8641 | 0.3703
+Optimized | 48 | True | 2x4 | True | LAMB | 2.53 | 971.52 | 1225 | 470400 | 0.8641 | 0.3703
 * #sentences/sec = bs * #steps/sec * #gpus
 * throughput at 20mins = bs * #steps at 20mis * #gpus
 
@@ -87,9 +87,10 @@ bash ./hpcai_scripts/eval.sh
 ## Run Optimized Code
 
 To run the optimized code on 2 nodes with 4 GPUs on each node, you need to follow the following steps:
-1. Copy folders `apps` and `scripts` under the $PATH_TO_SUBMISSION/multinode_communication to $HOME directory
+1. Copy folders `apps` and `scripts` under the $PATH_TO_SUBMISSION/multinode_communication to $HOME directory, and make a empty folder `sshcont` under $HOME directory
 ```shell 
 cp -r $PATH_TO_SUBMISSION/multinode_communication/* $HOME
+mkdir $HOME/sshcont
 ```
 
 2. Edit file $HOME/scripts/sshcont/`job_tensorflow_gloo.sh`
