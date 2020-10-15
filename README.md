@@ -25,6 +25,20 @@ This ensures the experiments are compared consistently.
 git clone https://github.com/FrankLeeeee/HPCAI-2020-BERT-Submission.git
 ```
 
+## Dependency
+CUDA | cuDNN | NCCL | Tensorflow | Horovod | Python
+- | - | - | - | - | - 
+10.2 | 7.6.5 | 2.5.6 | 1.15 | 0.19 | 3.6.9
+
+## Results
+model | bs | xla | #gpus | grad ckpt | optim | #steps/sec | #sentences/sec | #steps at 20mis | throughput at 20mins | acc | loss
+- | - | - | - | - | - | - | - | - | - | - | -
+Baseline | 24 | True | 1 | False | LAMB | 4.8 | 115.2 | 2938 | 70512 | 0.804 | 0.504
+Optimized | 48 | True | 8 | True | LAMB | 2.53 | 971.52 | 1225 | 470400 | 0.8641 | 0.3703
+**Formula**
+* #sentences/sec = bs * #steps/sec * #gpus
+* throughput at 20mins = bs * #steps at 20mis * #gpus
+
 
 ## Run Baseline
 
@@ -81,15 +95,15 @@ cp -r $PATH_TO_SUBMISSION/multinode_communication/* $HOME
 2. Edit file $HOME/scripts/sshcont/`job_tensorflow_gloo.sh`
 ```
 # edit line 6: RESULTS_DIR pointing to the directory where experiment results are saved 
-# RESULTS_DIR=...
+RESULTS_DIR=...
 # edit line 13: GLUE_SCRIPT pointing to `BERT/hpcai_scripts/run_glue_nscc.sh`
-# GLUE_SCRIPT=$PATH_TO_SUBMISSION/BERT/hpcai_scripts/run_glue_nscc.sh
+GLUE_SCRIPT=$PATH_TO_SUBMISSION/BERT/hpcai_scripts/run_glue_nscc.sh
 ```
 3. Edit file $HOME/scripts/sshcont/`tensorflow.sh` (this is the time for establishing connections among all nodes, and usually 180s is enough. you may increase it as you scale to more nodes or the network is slower) 
 ```
 # edit line 13 and 14: xxxs (e.g. 180s) 
-# echo "Waiting xxxs for SSH servers to be up"
-# sleep xxxs
+echo "Waiting xxxs for SSH servers to be up"
+sleep xxxs
 ```
 
 4. The optimized code is using the model with gradient checkpointing. Thus, you need to edit the `run_classifier.py` like below:
